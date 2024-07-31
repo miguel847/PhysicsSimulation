@@ -1,0 +1,28 @@
+{
+	"version": 1,
+	"cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 28,
+    "patch": 0
+	},
+	"configurePresets": [
+		{
+			"name": "debug",
+			"generator": "MinGW Makefiles",
+			"binaryDir": "${sourceDir}/build",
+			"cacheVariables": {
+				"CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "release",
+			"generator": "MinGW Makefiles",
+			"binaryDir": "${sourceDir}/build",
+			"cacheVariables": {
+				"CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"CMAKE_BUILD_TYPE": "Release"
+			}
+		}
+	]
+}
