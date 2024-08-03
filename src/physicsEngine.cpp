@@ -27,14 +27,15 @@ float precisionRound(float var)
   return (float)value / 100;
 }
 
-struct vector2 {
+typedef struct vector2 {
   float x;
   float y;
-  friend vector2  operator+(const vector2 vector);
+  friend vector2  operator+(const vector2 inputVector1, const vector2 inputVector2);
+  friend vector2 operator-(const vector2 inputVector1, const vector2 inputVector2);
   friend std::ostream& operator<<(std::ostream& os, const vector2& vector);
   vector2();
   vector2(float inputX, float inputY);
-};
+} vector2;
 
 vector2 operator+(const vector2 inputVector1, const vector2 inputVector2){
   vector2 returnVector(0,0);
@@ -42,15 +43,27 @@ vector2 operator+(const vector2 inputVector1, const vector2 inputVector2){
   returnVector.y = inputVector1.y + inputVector2.y;
   return returnVector;
 }
-
+vector2 operator-(const vector2 inputVector1, const vector2 inputVector2){
+  vector2 returnVector(0,0);
+  returnVector.x = inputVector1.x - inputVector2.x;
+  returnVector.y = inputVector1.y - inputVector2.y;
+  return returnVector;
+}
 std::ostream& operator<<(std::ostream& os, const vector2& vector){
   os << "(" << vector.x << "," << vector.y << ")";
   return os;
 }
-
 vector2::vector2() : x(0), y(0) {}
-
 vector2::vector2(float inputX, float inputY) : x(inputX), y(inputY) {}
+
+float dotProduct(const vector2 inputVector1, const vector2 inputVector2){
+  return (inputVector1.x * inputVector2.x + inputVector1.y * inputVector2.y);
+}
+
+vector2 multiplyVectorByScalar(const vector2 inputVector1, const float scalar){
+  vector2 returnVector = vector2(scalar*inputVector1.x,scalar*inputVector1.y);
+  return returnVector;
+}
 
 struct force {
   degrees direction;
@@ -91,4 +104,28 @@ std::pair<float,float> solve1DCollision(float b1SpeedComponent, float b2SpeedCom
   returnPair.first = ((b1SpeedComponent * (b1Mass - b2Mass)) + (2 * (b2Mass * b2SpeedComponent)))/(b1Mass + b2Mass);
   returnPair.second = ((b2SpeedComponent * (b2Mass - b1Mass)) + (2 * (b1Mass * b1SpeedComponent)))/(b1Mass + b2Mass);
   return returnPair;
-} 
+}
+
+std::pair<vector2, vector2> solve2DCollision(body* b1, body* b2){
+  vector2 normalVector = b2->position - b1->position;
+  float magnitudeOfNormalVector = sqrt(pow(normalVector.x,2) + pow(normalVector.y,2));
+  vector2 unitaryNormalVector = vector2(normalVector.x/magnitudeOfNormalVector, normalVector.y/magnitudeOfNormalVector);
+  vector2 unitaryTangentVector = vector2(-unitaryNormalVector.y, -unitaryNormalVector.x);
+
+  float v1n = dotProduct(b1->speed,unitaryNormalVector);
+  float v1t = dotProduct(b1->speed,unitaryTangentVector);
+  float v2n = dotProduct(b2->speed,unitaryNormalVector);
+  float v2t = dotProduct(b2->speed,unitaryTangentVector);
+
+  std::pair<float, float> newVelocities = solve1DCollision(v1n, v2n, b1->mass, b2->mass); 
+  
+  vector2 v1nf = multiplyVectorByScalar(unitaryNormalVector,newVelocities.first);
+  vector2 v1tf = multiplyVectorByScalar(unitaryTangentVector, v1t);
+  vector2 v2nf = multiplyVectorByScalar(unitaryNormalVector,newVelocities.second);
+  vector2 v2tf = multiplyVectorByScalar(unitaryTangentVector, v2t);
+
+  std::pair<vector2, vector2> returnVector;
+  returnVector.first = v1nf + v1tf;
+  returnVector.second = v2nf + v2tf;
+  return returnVector;
+}
