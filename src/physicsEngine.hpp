@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <vector>
+#include <utility>
 
 using degrees = int;
 using radians = float;
@@ -31,10 +32,14 @@ struct force {
 
 struct body {
   vector2 position;
+  float mass = 1;
+  float radius = 1;
   vector2 speed;
   vector2 speedToAdd;
-  body(vector2 inputPosition, vector2 inputSpeed = vector2(), vector2 inputSpeedToAdd = vector2());
+  body(vector2 inputPosition, float inputMass, float inputRadius, vector2 inputSpeed = vector2(), vector2 inputSpeedToAdd = vector2());
 };
 
 vector2 forceToVector(const force inputForce);
 force vectorToForce(const vector2 vector);
+
+std::pair<float,float> solve1DCollision(float b1SpeedComponent, float b2SpeedComponent, float b1Mass, float b2Mass);

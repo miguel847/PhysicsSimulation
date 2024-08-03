@@ -3,6 +3,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <vector>
+#include <utility>
 
 using degrees = int;
 using radians = float;
@@ -76,10 +77,18 @@ force vectorToForce(const vector2 vector){
 
 struct body {
   vector2 position;
+  float mass = 1;
+  float radius = 1;
   vector2 speed;
   vector2 speedToAdd;
-  body(vector2 inputPosition, vector2 inputSpeed = vector2(), vector2 inputSpeedToAdd = vector2());
+  body(vector2 inputPosition, float inputMass, float inputRadius, vector2 inputSpeed = vector2(), vector2 inputSpeedToAdd = vector2());
 };
 
-body::body(vector2 inputPosition, vector2 inputSpeed, vector2 inputSpeedToAdd) : position(inputPosition), speed(inputSpeed), speedToAdd(inputSpeedToAdd) {}
+body::body(vector2 inputPosition, float inputMass, float inputRadius, vector2 inputSpeed, vector2 inputSpeedToAdd) : position(inputPosition), mass(inputMass), radius(inputRadius), speed(inputSpeed), speedToAdd(inputSpeedToAdd) {}
 
+std::pair<float,float> solve1DCollision(float b1SpeedComponent, float b2SpeedComponent, float b1Mass, float b2Mass){
+  std::pair<float,float> returnPair;
+  returnPair.first = ((b1SpeedComponent * (b1Mass - b2Mass)) + (2 * (b2Mass * b2SpeedComponent)))/(b1Mass + b2Mass);
+  returnPair.second = ((b2SpeedComponent * (b2Mass - b1Mass)) + (2 * (b1Mass * b1SpeedComponent)))/(b1Mass + b2Mass);
+  return returnPair;
+} 
