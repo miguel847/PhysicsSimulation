@@ -59,14 +59,6 @@ struct force {
 
 force::force(degrees inputDirection, float inputMagnitude) : direction(inputDirection), magnitude(inputMagnitude) {}
 
-struct body {
-  vector2 position;
-  vector2 speed;
-  vector2 speedToAdd;
-  body(vector2 inputPosition, vector2 inputSpeed = vector2(), vector2 inputSpeedToAdd = vector2());
-};
-
-body::body(vector2 inputPosition, vector2 inputSpeed, vector2 inputSpeedToAdd) : position(inputPosition), speed(inputSpeed), speedToAdd(inputSpeedToAdd) {}
 
 vector2 forceToVector(const force inputForce){
   vector2 returnVector;
@@ -81,3 +73,13 @@ force vectorToForce(const vector2 vector){
   returnForce.direction = round(radiansToDegrees(atan2(vector.y,vector.x)));
   return returnForce;
 }
+
+struct body {
+  vector2 position;
+  vector2 speed;
+  vector2 speedToAdd;
+  body(vector2 inputPosition, vector2 inputSpeed = vector2(), vector2 inputSpeedToAdd = vector2());
+};
+
+body::body(vector2 inputPosition, vector2 inputSpeed, vector2 inputSpeedToAdd) : position(inputPosition), speed(inputSpeed), speedToAdd(inputSpeedToAdd) {}
+
