@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <vector>
 #include <utility>
+#include <algorithm>
 
 using degrees = int;
 using radians = float;
@@ -48,3 +49,10 @@ force vectorToForce(const vector2 vector);
 
 std::pair<float,float> solve1DCollision(float b1SpeedComponent, float b2SpeedComponent, float b1Mass, float b2Mass); 
 std::pair<vector2, vector2> solve2DCollision(body* b1, body* b2);
+
+typedef struct simulation{
+  std::vector<body*> simulationBodies;
+  void handleTick(double dt);
+  void addBody(vector2 inputPosition, float inputMass, float inputRadius, vector2 inputSpeed = vector2(), vector2 inputSpeedToAdd = vector2());
+} simulation;
+

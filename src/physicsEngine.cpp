@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <vector>
 #include <utility>
+#include <algorithm>
+#include <execution>
 
 using degrees = int;
 using radians = float;
@@ -128,4 +130,24 @@ std::pair<vector2, vector2> solve2DCollision(body* b1, body* b2){
   returnVector.first = v1nf + v1tf;
   returnVector.second = v2nf + v2tf;
   return returnVector;
+}
+
+typedef struct simulation{
+  std::vector<body*> simulationBodies;
+  void handleTick(double dt);
+  void addBody(vector2 inputPosition, float inputMass, float inputRadius, vector2 inputSpeed = vector2(), vector2 inputSpeedToAdd = vector2());
+} simulation;
+
+void simulation::addBody(vector2 inputPosition, float inputMass, float inputRadius, vector2 inputSpeed, vector2 inputSpeedToAdd){
+  body* b = new body(inputPosition, inputMass, inputRadius, inputSpeed, inputSpeedToAdd);
+  simulationBodies.push_back(b);
+}
+
+void simulation::handleTick(double dt){
+
+  std::for_each(simulationBodies.begin(), simulationBodies.end(), [=](body* b){
+    vector2 timedVector = vector2(b->speed.x * dt, b->speed.y * dt);
+    std::cout << timedVector.x << "\n";
+    b->position = b->position + timedVector;
+  });
 }
