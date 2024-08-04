@@ -1,20 +1,23 @@
 #include <iostream>
-#include <sdl.h>
+#include <SDL2/sdl.h>
 #include <fmt/core.h>
 #include <physicsEngine.hpp>
 #include <utility>
 
 using namespace std;
 
-int main(int argc, char *argv[]){
-  body b1(vector2(0,0), 1, 1, vector2(1,0));
-  body b2(vector2(2,0), 2, 1, vector2(0,0.50));
-  std::pair<vector2,vector2> result = solve2DCollision(&b1,&b2);
-  
-  fmt::print("({},",result.first.x);
-  fmt::print("{})\n",result.first.y);
+//Screen Resolution
+const int screenHeight = 600;
+const int screenWidth = 800;
 
-  fmt::print("({},",result.second.x);
-  fmt::print("{})\n",result.second.y);
-	return 0;
+int main(int argc, char *argv[]){
+  
+  SDL_Window* window = SDL_CreateWindow("Collision Simulation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, SDL_WINDOW_SHOWN);
+  SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+  
+
+  SDL_DestroyRenderer(renderer);
+  SDL_DestroyWindow(window);
+  SDL_Quit();
+  return 0;
 }
