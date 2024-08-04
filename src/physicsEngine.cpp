@@ -145,9 +145,8 @@ void simulation::addBody(vector2 inputPosition, float inputMass, float inputRadi
 
 void simulation::handleTick(double dt){
 
-  std::for_each(simulationBodies.begin(), simulationBodies.end(), [=](body* b){
+  std::for_each(std::execution::par_unseq,simulationBodies.begin(), simulationBodies.end(), [=](body* b){
     vector2 timedVector = vector2(b->speed.x * dt, b->speed.y * dt);
-    std::cout << timedVector.x << "\n";
     b->position = b->position + timedVector;
   });
 }

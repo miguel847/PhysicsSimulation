@@ -84,7 +84,8 @@ int main(int argc, char *argv[]){
   double deltaTime = 0;
   
   simulation runningSimulation;
-  runningSimulation.addBody(vector2(0,0), 1, 10, vector2(1,0));
+  runningSimulation.addBody(vector2(0,0), 1, 10, vector2(5,0));
+  runningSimulation.addBody(vector2(100,0), 1, 10, vector2(-5,0));
 
   //Event loop
   while (running){
@@ -104,8 +105,6 @@ int main(int argc, char *argv[]){
     }
 
     runningSimulation.handleTick(deltaTime);
-    fmt::print("Deltatime: {} \n", deltaTime);
-    fmt::print("Position: {} \n \n", (runningSimulation.simulationBodies[0])->position.x);
 
     DrawBodies(renderer, runningSimulation.simulationBodies,colorWhite);
     /* update the screen */
