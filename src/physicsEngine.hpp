@@ -44,6 +44,9 @@ struct body {
   body(vector2 inputPosition, float inputMass, float inputRadius, vector2 inputSpeed = vector2(), vector2 inputSpeedToAdd = vector2());
 };
 
+bool isColliding(body* b1, body* b2);
+
+
 vector2 forceToVector(const force inputForce);
 force vectorToForce(const vector2 vector);
 

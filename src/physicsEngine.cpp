@@ -101,6 +101,19 @@ struct body {
 
 body::body(vector2 inputPosition, float inputMass, float inputRadius, vector2 inputSpeed, vector2 inputSpeedToAdd) : position(inputPosition), mass(inputMass), radius(inputRadius), speed(inputSpeed), speedToAdd(inputSpeedToAdd) {}
 
+bool isColliding(body* b1, body* b2){
+  const float distanceX = b1->position.x - b2->position.x;
+  const float distanceY = b1->position.y - b2->position.y;
+  const vector2 vecDistance(distanceX, distanceY);
+  const float magnitudeOfDistance = sqrt(pow(vecDistance.x,2) + pow(vecDistance.y,2));
+  
+  if (magnitudeOfDistance <= b1->radius + b2->radius){
+    return true;
+  }
+  return false;
+
+}
+
 std::pair<float,float> solve1DCollision(float b1SpeedComponent, float b2SpeedComponent, float b1Mass, float b2Mass){
   std::pair<float,float> returnPair;
   returnPair.first = ((b1SpeedComponent * (b1Mass - b2Mass)) + (2 * (b2Mass * b2SpeedComponent)))/(b1Mass + b2Mass);

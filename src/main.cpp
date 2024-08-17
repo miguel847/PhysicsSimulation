@@ -86,7 +86,8 @@ int main(int argc, char *argv[]){
   simulation runningSimulation;
   runningSimulation.addBody(vector2(0,0), 1, 10, vector2(5,0));
   runningSimulation.addBody(vector2(100,0), 1, 10, vector2(-5,0));
-
+  
+  fmt::print("Simulation Starting \n");
   //Event loop
   while (running){
     
@@ -103,7 +104,10 @@ int main(int argc, char *argv[]){
           break;
       }
     }
-
+    
+    if (isColliding(runningSimulation.simulationBodies[0], runningSimulation.simulationBodies[1])){
+      fmt::print("Collision Happened \n");
+    }
     runningSimulation.handleTick(deltaTime);
 
     DrawBodies(renderer, runningSimulation.simulationBodies,colorWhite);
