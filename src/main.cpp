@@ -83,11 +83,12 @@ int main(int argc, char *argv[]){
   Uint64 LAST = 0;
   double deltaTime = 0;
   
-  simulation runningSimulation;
-  runningSimulation.addBody(vector2(0,0), 1, 10, vector2(5,0));
-  runningSimulation.addBody(vector2(100,0), 1, 10, vector2(-5,0));
+  simulation runningSimulation(3000,1000);
+  runningSimulation.addBody(vector2(60,10), 1, 10, vector2(5,0));
+  runningSimulation.addBody(vector2(100,10), 1, 10, vector2(-5,0));
   
   fmt::print("Simulation Starting \n");
+
   //Event loop
   while (running){
     

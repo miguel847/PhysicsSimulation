@@ -32,12 +32,22 @@ float precisionRound(float var)
 typedef struct vector2 {
   float x;
   float y;
+
+  friend bool  operator==(const vector2 inputVector1, const vector2 inputVector2);
   friend vector2  operator+(const vector2 inputVector1, const vector2 inputVector2);
   friend vector2 operator-(const vector2 inputVector1, const vector2 inputVector2);
   friend std::ostream& operator<<(std::ostream& os, const vector2& vector);
+
   vector2();
   vector2(float inputX, float inputY);
 } vector2;
+
+bool operator==(const vector2 inputVector1, const vector2 inputVector2){
+  if (inputVector1.x == inputVector2.x && inputVector1.y == inputVector2.y){
+    return true;
+  }
+  return false;
+}
 
 vector2 operator+(const vector2 inputVector1, const vector2 inputVector2){
   vector2 returnVector(0,0);
@@ -55,6 +65,15 @@ std::ostream& operator<<(std::ostream& os, const vector2& vector){
   os << "(" << vector.x << "," << vector.y << ")";
   return os;
 }
+
+struct vector2HashFunction 
+{ 
+  size_t operator()(const vector2 &v) const
+  { 
+    return pow(v.x,v.y); 
+  } 
+}; 
+
 vector2::vector2() : x(0), y(0) {}
 vector2::vector2(float inputX, float inputY) : x(inputX), y(inputY) {}
 
@@ -101,6 +120,7 @@ struct body {
 
 body::body(vector2 inputPosition, float inputMass, float inputRadius, vector2 inputSpeed, vector2 inputSpeedToAdd) : position(inputPosition), mass(inputMass), radius(inputRadius), speed(inputSpeed), speedToAdd(inputSpeedToAdd) {}
 
+
 bool isColliding(body* b1, body* b2){
   const float distanceX = b1->position.x - b2->position.x;
   const float distanceY = b1->position.y - b2->position.y;
@@ -145,11 +165,50 @@ std::pair<vector2, vector2> solve2DCollision(body* b1, body* b2){
   return returnVector;
 }
 
+
+
+typedef struct spatialGrid {
+  std::unordered_map<vector2, std::vector<body*>, vector2HashFunction> cells;
+
+  float cellWidth = 1;
+  float cellHeight = 1;
+
+  void insertBodyIntoCells(body* b1);
+  void setup(float iCellWidth, float iCellHeight, float simulationWidth, float simulationHeight);
+
+
+  spatialGrid();
+
+} spatialGrid;
+
+void spatialGrid::insertBodyIntoCells(body* b1){
+  return;
+}
+
+void spatialGrid::setup(float iCellWidth, float iCellHeight, float simulationWidth, float simulationHeight){
+  const int numberOfCellsPerColum = std::ceil(simulationHeight/iCellHeight);
+  const int numberOfCellsPerRow = std::ceil(simulationWidth/iCellWidth);
+
+}
+
+spatialGrid::spatialGrid(){}
+
 typedef struct simulation{
   std::vector<body*> simulationBodies;
+  float simulationWidth;
+  float simulationHeight;
+  spatialGrid collisionGrid;
   void handleTick(double dt);
   void addBody(vector2 inputPosition, float inputMass, float inputRadius, vector2 inputSpeed = vector2(), vector2 inputSpeedToAdd = vector2());
+  
+  simulation(float iSimulationWidth, float iSimulationHeight);
 } simulation;
+
+simulation::simulation(float iSimulationWidth, float iSimulationHeight){
+  simulationWidth = iSimulationWidth;
+  simulationHeight = iSimulationHeight;
+  collisionGrid.setup(50,50, iSimulationWidth, iSimulationHeight);
+}
 
 void simulation::addBody(vector2 inputPosition, float inputMass, float inputRadius, vector2 inputSpeed, vector2 inputSpeedToAdd){
   body* b = new body(inputPosition, inputMass, inputRadius, inputSpeed, inputSpeedToAdd);
