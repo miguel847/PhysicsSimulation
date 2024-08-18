@@ -6,6 +6,7 @@
 #include <utility>
 #include <algorithm>
 #include <execution>
+#include <memory>
 
 using degrees = int;
 using radians = float;
@@ -168,7 +169,7 @@ std::pair<vector2, vector2> solve2DCollision(body* b1, body* b2){
 
 
 typedef struct spatialGrid {
-  std::unordered_map<vector2, std::vector<body*>, vector2HashFunction> cells;
+  std::unique_ptr<std::unordered_map<vector2, std::vector<body*>, vector2HashFunction>> cells = std::make_unique<std::unordered_map<vector2, std::vector<body*>, vector2HashFunction>>();
 
   float cellWidth = 1;
   float cellHeight = 1;
@@ -188,6 +189,12 @@ void spatialGrid::insertBodyIntoCells(body* b1){
 void spatialGrid::setup(float iCellWidth, float iCellHeight, float simulationWidth, float simulationHeight){
   const int numberOfCellsPerColum = std::ceil(simulationHeight/iCellHeight);
   const int numberOfCellsPerRow = std::ceil(simulationWidth/iCellWidth);
+
+  for (int x = 0 - std::ceil(numberOfCellsPerRow/2) - 1; x <= std::floor(numberOfCellsPerRow/2); ++x){
+    for (int y = 0 - std::ceil(numberOfCellsPerColum/2) - 1; y <= std::floor(numberOfCellsPerColum/2); ++y){
+      (*cells)[vector2(x,y)] = std::vector<body*>{};  
+    }
+  }
 
 }
 
