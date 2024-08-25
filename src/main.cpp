@@ -53,8 +53,9 @@ void DrawCircle(SDL_Renderer* renderer, int32_t centreX, int32_t centreY, int32_
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, 100);
 }
 
-void DrawBodies(SDL_Renderer* renderer, vector<body*>& bodyArray, SDL_Color color){
-  for(auto body : bodyArray){
+void DrawBodies(SDL_Renderer* renderer, vector<std::unique_ptr<body>>& bodyArray, SDL_Color color){
+  for(int i = 0; i < bodyArray.size(); ++i){
+    auto body = bodyArray[i].get();
     DrawCircle(renderer, body->position.x+(screenWidth/2), body->position.y+(screenHeight/2), body->radius, color);
   }
 }
@@ -106,7 +107,7 @@ int main(int argc, char *argv[]){
       }
     }
     
-    if (isColliding(runningSimulation.simulationBodies[0], runningSimulation.simulationBodies[1])){
+    if (isColliding(runningSimulation.simulationBodies[0].get(), runningSimulation.simulationBodies[1].get())){
       fmt::print("Collision Happened \n");
     }
     runningSimulation.handleTick(deltaTime);

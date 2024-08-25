@@ -117,9 +117,12 @@ struct body {
   vector2 speed;
   vector2 speedToAdd;
   body(vector2 inputPosition, float inputMass, float inputRadius, vector2 inputSpeed = vector2(), vector2 inputSpeedToAdd = vector2());
+  ~body();
 };
 
 body::body(vector2 inputPosition, float inputMass, float inputRadius, vector2 inputSpeed, vector2 inputSpeedToAdd) : position(inputPosition), mass(inputMass), radius(inputRadius), speed(inputSpeed), speedToAdd(inputSpeedToAdd) {}
+
+body::~body(){}
 
 
 bool isColliding(body* b1, body* b2){
@@ -201,7 +204,7 @@ void spatialGrid::setup(float iCellWidth, float iCellHeight, float simulationWid
 spatialGrid::spatialGrid(){}
 
 typedef struct simulation{
-  std::vector<body*> simulationBodies;
+  std::vector<std::unique_ptr<body>> simulationBodies;
   float simulationWidth;
   float simulationHeight;
   spatialGrid collisionGrid;
@@ -218,13 +221,13 @@ simulation::simulation(float iSimulationWidth, float iSimulationHeight){
 }
 
 void simulation::addBody(vector2 inputPosition, float inputMass, float inputRadius, vector2 inputSpeed, vector2 inputSpeedToAdd){
-  body* b = new body(inputPosition, inputMass, inputRadius, inputSpeed, inputSpeedToAdd);
-  simulationBodies.push_back(b);
+  std::unique_ptr<body> b = std::make_unique<body>(inputPosition, inputMass, inputRadius, inputSpeed, inputSpeedToAdd);
+  simulationBodies.push_back(std::move(b));
 }
 
 void simulation::handleTick(double dt){
 
-  std::for_each(std::execution::par_unseq,simulationBodies.begin(), simulationBodies.end(), [=](body* b){
+  std::for_each(std::execution::par_unseq,simulationBodies.begin(), simulationBodies.end(), [=](std::unique_ptr<body>& b){
     vector2 timedVector = vector2(b->speed.x * dt, b->speed.y * dt);
     b->position = b->position + timedVector;
   });

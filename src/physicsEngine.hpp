@@ -51,6 +51,7 @@ struct body {
   vector2 speed;
   vector2 speedToAdd;
   body(vector2 inputPosition, float inputMass, float inputRadius, vector2 inputSpeed = vector2(), vector2 inputSpeedToAdd = vector2());
+  ~body();
 };
 
 bool isColliding(body* b1, body* b2);
@@ -77,7 +78,7 @@ typedef struct spatialGrid {
 } spatialGrid;
 
 typedef struct simulation{
-  std::vector<body*> simulationBodies;
+  std::vector<std::unique_ptr<body>> simulationBodies;
   float simulationWidth;
   float simulationHeight;
   spatialGrid collisionGrid;
