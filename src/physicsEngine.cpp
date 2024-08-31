@@ -172,12 +172,20 @@ std::pair<vector2, vector2> solve2DCollision(body* b1, body* b2){
 
 
 typedef struct spatialGrid {
-  std::unique_ptr<std::unordered_map<vector2, std::vector<body*>, vector2HashFunction>> cells = std::make_unique<std::unordered_map<vector2, std::vector<body*>, vector2HashFunction>>();
+  std::unique_ptr<std::unordered_map<vector2, std::unordered_set<body*>, vector2HashFunction>> cells = std::make_unique<std::unordered_map<vector2, std::unordered_set<body*>, vector2HashFunction>>();
 
   float cellWidth = 1;
   float cellHeight = 1;
 
+  float minimumCellXinHash;
+  float maximumCellXinHash;
+  
+  float minimumCellYinHash;
+  float maximumCellYinHash;
+  
+  vector2 getCellOfCoordinates(float x, float y);
   void insertBodyIntoCells(body* b1);
+  void clearCells();
   void setup(float iCellWidth, float iCellHeight, float simulationWidth, float simulationHeight);
 
 
@@ -185,17 +193,55 @@ typedef struct spatialGrid {
 
 } spatialGrid;
 
+vector2 spatialGrid::getCellOfCoordinates(float x, float y){
+  const float rX = std::floor(x/cellWidth);
+  const float rY = std::floor(y/cellHeight);
+
+  return vector2(rX, rY);
+}
+
 void spatialGrid::insertBodyIntoCells(body* b1){
+  const float minX = b1->position.x - b1->radius;
+  const float maxX = b1->position.x + b1->radius;
+
+  const float minY = b1->position.y - b1->radius;
+  const float maxY = b1->position.y + b1->radius;
+
+  vector2 debugInfo = getCellOfCoordinates(minX, minY);
+  cells->find(getCellOfCoordinates(minX, minY))->second.insert(b1);
+  debugInfo = getCellOfCoordinates(minX, minY);
+  cells->find(getCellOfCoordinates(maxX, minY))->second.insert(b1);
+  cells->find(getCellOfCoordinates(minX, maxY))->second.insert(b1);
+  cells->find(getCellOfCoordinates(maxX, maxY))->second.insert(b1);
+
   return;
 }
 
+void spatialGrid::clearCells(){
+  for (auto i : (*cells)){
+    i.second.clear();
+  }
+}
+
 void spatialGrid::setup(float iCellWidth, float iCellHeight, float simulationWidth, float simulationHeight){
+
+  cellHeight = iCellHeight;
+  cellWidth = iCellWidth;
+
   const int numberOfCellsPerColum = std::ceil(simulationHeight/iCellHeight);
   const int numberOfCellsPerRow = std::ceil(simulationWidth/iCellWidth);
 
-  for (int x = 0 - std::ceil(numberOfCellsPerRow/2) - 1; x <= std::floor(numberOfCellsPerRow/2); ++x){
-    for (int y = 0 - std::ceil(numberOfCellsPerColum/2) - 1; y <= std::floor(numberOfCellsPerColum/2); ++y){
-      (*cells)[vector2(x,y)] = std::vector<body*>{};  
+  minimumCellXinHash = 0 - std::ceil(numberOfCellsPerRow/2) - 1;
+  maximumCellXinHash = std::floor(numberOfCellsPerRow/2); 
+
+  minimumCellYinHash = 0 - std::ceil(numberOfCellsPerColum/2) - 1;
+  maximumCellYinHash = std::floor(numberOfCellsPerColum/2);
+
+  //Distributes the number of cells per row uniformily below and above 0
+  for (int x = minimumCellXinHash; x <= maximumCellXinHash; ++x){
+    //Distributes the number of cells per colum uniformily below and above 0
+    for (int y = minimumCellYinHash; y <= maximumCellYinHash; ++y){
+      (*cells)[vector2(x,y)] = std::unordered_set<body*>{};  
     }
   }
 
@@ -217,7 +263,7 @@ typedef struct simulation{
 simulation::simulation(float iSimulationWidth, float iSimulationHeight){
   simulationWidth = iSimulationWidth;
   simulationHeight = iSimulationHeight;
-  collisionGrid.setup(50,50, iSimulationWidth, iSimulationHeight);
+  collisionGrid.setup(60, 500, iSimulationWidth, iSimulationHeight);
 }
 
 void simulation::addBody(vector2 inputPosition, float inputMass, float inputRadius, vector2 inputSpeed, vector2 inputSpeedToAdd){
@@ -226,9 +272,20 @@ void simulation::addBody(vector2 inputPosition, float inputMass, float inputRadi
 }
 
 void simulation::handleTick(double dt){
+  
+  for (auto& body : simulationBodies){
+    collisionGrid.insertBodyIntoCells(body.get());
+  }
 
+  for (auto cell : (*collisionGrid.cells)){
+    if (cell.second.size() > 1){
+      std::cout << "+2 bodies in a cell \n";
+    }
+  }
   std::for_each(std::execution::par_unseq,simulationBodies.begin(), simulationBodies.end(), [=](std::unique_ptr<body>& b){
     vector2 timedVector = vector2(b->speed.x * dt, b->speed.y * dt);
     b->position = b->position + timedVector;
   });
+
+  collisionGrid.clearCells();
 }

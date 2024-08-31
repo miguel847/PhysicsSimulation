@@ -70,7 +70,15 @@ typedef struct spatialGrid {
   float cellWidth = 1;
   float cellHeight = 1;
 
+  float minimumCellXinHash;
+  float maxCellXinHash;
+  
+  float minimumCellYinHash;
+  float maxCellYinHash;
+
+  vector2 getCellOfCoordinates(float x, float y);
   void insertBodyIntoCells(body* b1);
+  void clearCells();
   void setup(float iCellWidth, float iCellHeight, float simulationWidth, float simulationHeight);
 
   spatialGrid();
