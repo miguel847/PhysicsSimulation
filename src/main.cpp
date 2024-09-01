@@ -85,8 +85,9 @@ int main(int argc, char *argv[]){
   double deltaTime = 0;
   
   simulation runningSimulation(3000,1000);
-  runningSimulation.addBody(vector2(-50,10), 1, 10, vector2(5,0));
-  runningSimulation.addBody(vector2(100,10), 1, 10, vector2(-5,0));
+  runningSimulation.addBody(vector2(-50,10), 1, 10, vector2(90,0));
+  runningSimulation.addBody(vector2(100,10), 1, 10, vector2(0,0));
+  runningSimulation.addBody(vector2(250,10), 2, 20, vector2(-20,1));
   
   fmt::print("Simulation Starting \n");
 

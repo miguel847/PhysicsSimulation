@@ -3,6 +3,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <vector>
+#include <array>
 #include <utility>
 #include <algorithm>
 #include <execution>
@@ -278,8 +279,37 @@ void simulation::handleTick(double dt){
   }
 
   for (auto cell : (*collisionGrid.cells)){
+
     if (cell.second.size() > 1){
-      std::cout << "+2 bodies in a cell \n";
+      std::vector<std::pair<body*,body*>> searched;
+
+      for (auto body : cell.second){
+
+        for (auto secondBody : cell.second){
+
+          bool isSecondBodyAlreadySearched = false;
+          for (auto pair : searched){
+            if (pair.first == secondBody && pair.second == body){
+              isSecondBodyAlreadySearched = true;
+              break;
+            }
+          }
+          if (secondBody != body && !isSecondBodyAlreadySearched){
+            searched.push_back({body, secondBody});
+            if (isColliding(body, secondBody)){
+
+              std::cout << "Old Speed: " << "(" << body->speed.x << "," << body->speed.y << ") and (" << secondBody->speed.x << "," << secondBody->speed.y << ") \n";
+              const std::pair<vector2, vector2> newVelocities = solve2DCollision(body, secondBody);
+              std::cout << "New Speed: " << newVelocities.first << ", " << newVelocities.second << "\n";
+
+              printf("Break \n");
+
+              body->speed = newVelocities.first;
+              secondBody->speed = newVelocities.second;
+            }
+          }
+        }
+      }
     }
   }
   std::for_each(std::execution::par_unseq,simulationBodies.begin(), simulationBodies.end(), [=](std::unique_ptr<body>& b){

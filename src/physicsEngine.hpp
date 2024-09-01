@@ -65,7 +65,7 @@ std::pair<vector2, vector2> solve2DCollision(body* b1, body* b2);
 
 
 typedef struct spatialGrid {
-  std::unordered_map<vector2, std::vector<body*>, vector2HashFunction> cells;
+  std::unordered_map<vector2, std::unordered_set<body*>, vector2HashFunction> cells;
 
   float cellWidth = 1;
   float cellHeight = 1;
