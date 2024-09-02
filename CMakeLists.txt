@@ -14,6 +14,10 @@ find_package(sdl2 REQUIRED)
 find_package(fmt REQUIRED)
 
 add_library(physicsEngine OBJECT ${SRC_DIRECTORY}/physicsEngine.cpp)
+
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+	target_compile_options(physicsEngine PRIVATE -Wall -Wextra -Wpedantic)
+endif()
 target_include_directories(physicsEngine PUBLIC ${SRC_DIRECTORY})
 target_link_libraries(physicsEngine PRIVATE fmt::fmt)
 
