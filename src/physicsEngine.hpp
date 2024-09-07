@@ -7,6 +7,7 @@
 #include <vector>
 #include <utility>
 #include <algorithm>
+#include <memory>
 
 using degrees = int;
 using radians = float;
